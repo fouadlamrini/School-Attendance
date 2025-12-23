@@ -40,17 +40,17 @@ export class AuthController {
       const userRepo = AppDataSource.getRepository(User);
 
       // Vérifier si l'email existe déjà
-      const existing = await userRepo.findOne({ where: { email } });
-      if (existing) {
-        return res.status(409).json({ message: 'Email already in use' });
+      const existingUser: User | null = await userRepo.findOne({ where: { email } });
+      if (existingUser) {
+        return res.status(400).json({ message: 'Email already in use' });
       }
 
-      // Hash password
-      const hashedPassword = await bcrypt.hash(password, 10);
+      // Hash password avec bcrypt
+      const hashedPassword: string = await bcrypt.hash(password, 10);
 
       // Créer et sauvegarder user
-      const user = userRepo.create({ name, email, password: hashedPassword });
-      const savedUser = await userRepo.save(user);
+      const user: User = userRepo.create({ name, email, password: hashedPassword });
+      const savedUser: User = await userRepo.save(user);
 
       // Ne pas retourner le password
       const { password: _, ...safeUser } = savedUser;
@@ -74,24 +74,24 @@ export class AuthController {
       }
 
       const userRepo = AppDataSource.getRepository(User);
-      const user = await userRepo.findOne({ where: { email } });
+      const user: User | null = await userRepo.findOne({ where: { email } });
 
       if (!user) {
-        return res.status(401).json({ message: 'Invalid credentials' });
+        return res.status(400).json({ message: 'Invalid email or password' });
       }
 
-      const isMatch = await bcrypt.compare(password, user.password);
+      const isMatch: boolean = await bcrypt.compare(password, user.password);
       if (!isMatch) {
-        return res.status(401).json({ message: 'Invalid credentials' });
+        return res.status(400).json({ message: 'Invalid email or password' });
       }
 
-      const secret = process.env.JWT_SECRET;
+      const secret: string | undefined = process.env.JWT_SECRET;
       if (!secret) {
         console.error('Missing JWT_SECRET environment variable');
         return res.status(500).json({ message: 'Authentication not configured' });
       }
 
-      const token = jwt.sign({ userId: user.id, role: user.role }, secret, { expiresIn: '7d' });
+      const token: string = jwt.sign({ userId: user.id, role: user.role }, secret, { expiresIn: '7d' });
 
       return res.json({ token });
     } catch (error) {
