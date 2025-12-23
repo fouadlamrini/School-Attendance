@@ -12,12 +12,12 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
-    'prettier', 
+    'prettier',
   ],
   rules: {
-    semi: ['error', 'always'],       
-    quotes: ['error', 'single'],       
-    indent: ['error', 2],           
+    semi: ['error', 'always'],
+    quotes: ['error', 'single'],
+    indent: ['error', 2],
     'prettier/prettier': 'error',
   },
 };
