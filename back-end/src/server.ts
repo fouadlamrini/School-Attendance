@@ -1,19 +1,33 @@
 import express, { Request, Response } from 'express';
-import { connectDB } from './config/db';
+import dotenv from 'dotenv';
+import authRoutes from './routes/auth';
+import { initializeDB } from './data-source';
+
+dotenv.config(); // Charger les variables d'environnement en premier
 
 const app = express();
-const PORT = 3000;
+app.use(express.json()); // Middleware pour parser le JSON
 
-app.use(express.json());
+// Initialiser la DB avant de démarrer le serveur
+initializeDB()
+  .then(() => {
+    console.log('Database initialized');
 
-// Test route
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello, EdTech backend with TypeScript!');
-});
+    // Routes
+    app.use('/auth', authRoutes);
 
-// Connecter à PostgreSQL avant de démarrer le serveur
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    // Test route
+    app.get('/', (_req: Request, res: Response) => {
+      res.send('API is running');
+    });
+
+    // Démarrage serveur
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Failed to initialize database', err);
+    process.exit(1); // Quitter si la DB ne démarre pas
   });
-});

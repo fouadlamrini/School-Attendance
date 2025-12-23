@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import validator from 'validator';
 import { AppDataSource } from '../data-source';
 import { User } from '../entities/User';
+import { UserRole } from '../entities/enums/Role';
 
 type RegisterBody = {
   name: string;
@@ -45,11 +46,17 @@ export class AuthController {
         return res.status(400).json({ message: 'Email already in use' });
       }
 
-      // Hash password avec bcrypt
+      // Hash password
       const hashedPassword: string = await bcrypt.hash(password, 10);
 
-      // Créer et sauvegarder user
-      const user: User = userRepo.create({ name, email, password: hashedPassword });
+      // Créer user avec role par défaut STUDENT
+      const user: User = userRepo.create({
+        name,
+        email,
+        password: hashedPassword,
+        role: UserRole.STUDENT, // <-- important pour éviter NULL
+      });
+
       const savedUser: User = await userRepo.save(user);
 
       // Ne pas retourner le password
