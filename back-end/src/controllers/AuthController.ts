@@ -10,11 +10,13 @@ type RegisterBody = {
   name: string;
   email: string;
   password: string;
+  role?: UserRole;
 };
 
 type LoginBody = {
   email: string;
   password: string;
+  role?: UserRole;
 };
 
 export class AuthController {
@@ -23,11 +25,13 @@ export class AuthController {
   // -------------------
   static async register(req: Request<{}, {}, RegisterBody>, res: Response) {
     try {
-      const { name, email, password } = req.body;
+      const { name, email, password, role } = req.body;
 
       // Validation simple
       if (!name || !email || !password) {
-        return res.status(400).json({ message: 'Name, email and password are required' });
+        return res
+          .status(400)
+          .json({ message: 'Name, email and password are required' });
       }
 
       if (!validator.isEmail(email)) {
@@ -35,13 +39,16 @@ export class AuthController {
       }
 
       if (password.length < 6) {
-        return res.status(400).json({ message: 'Password must be at least 6 characters' });
+        return res
+          .status(400)
+          .json({ message: 'Password must be at least 6 characters' });
       }
 
       const userRepo = AppDataSource.getRepository(User);
 
-      // Vérifier si l'email existe déjà
-      const existingUser: User | null = await userRepo.findOne({ where: { email } });
+      const existingUser: User | null = await userRepo.findOne({
+        where: { email },
+      });
       if (existingUser) {
         return res.status(400).json({ message: 'Email already in use' });
       }
@@ -49,12 +56,21 @@ export class AuthController {
       // Hash password
       const hashedPassword: string = await bcrypt.hash(password, 10);
 
-      // Créer user avec role par défaut STUDENT
+      // Déterminer le rôle
+      const usersCount = await userRepo.count();
+      let assignedRole: UserRole;
+      if (usersCount === 0) {
+        assignedRole = UserRole.ADMIN; // premier user devient admin
+      } else {
+        assignedRole = role || UserRole.STUDENT; // sinon role du body ou default STUDENT
+      }
+
+      // Créer user
       const user: User = userRepo.create({
         name,
         email,
         password: hashedPassword,
-        role: UserRole.STUDENT, // <-- important pour éviter NULL
+        role: assignedRole,
       });
 
       const savedUser: User = await userRepo.save(user);
@@ -77,7 +93,9 @@ export class AuthController {
       const { email, password } = req.body;
 
       if (!email || !password) {
-        return res.status(400).json({ message: 'Email and password are required' });
+        return res
+          .status(400)
+          .json({ message: 'Email and password are required' });
       }
 
       const userRepo = AppDataSource.getRepository(User);
@@ -95,12 +113,22 @@ export class AuthController {
       const secret: string | undefined = process.env.JWT_SECRET;
       if (!secret) {
         console.error('Missing JWT_SECRET environment variable');
-        return res.status(500).json({ message: 'Authentication not configured' });
+        return res
+          .status(500)
+          .json({ message: 'Authentication not configured' });
       }
 
-      const token: string = jwt.sign({ userId: user.id, role: user.role }, secret, { expiresIn: '7d' });
+      const token: string = jwt.sign(
+        { userId: user.id, role: user.role },
+        secret,
+        { expiresIn: '7d' },
+      );
 
-      return res.json({ token });
+      // Remove password before returning user object
+      const { password: _pwd, ...safeUser } = user;
+
+      // Return both token and sanitized user
+      return res.status(200).json({ token, user: safeUser });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: 'Internal server error' });

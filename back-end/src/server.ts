@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
+import classesRoutes from './routes/classes';
 import { initializeDB } from './data-source';
 
 dotenv.config(); // Charger les variables d'environnement en premier
@@ -15,6 +16,7 @@ initializeDB()
 
     // Routes
     app.use('/auth', authRoutes);
+    app.use('/classes', classesRoutes);
 
     // Test route
     app.get('/', (_req: Request, res: Response) => {
