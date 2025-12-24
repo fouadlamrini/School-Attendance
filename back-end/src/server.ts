@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
 import classesRoutes from './routes/classes';
 import studentsRoutes from './routes/students';
+import subjectsRoutes from './routes/subjects';
 import { initializeDB } from './data-source';
 
 dotenv.config(); // Charger les variables d'environnement en premier
@@ -19,6 +20,7 @@ initializeDB()
     app.use('/auth', authRoutes);
     app.use('/classes', classesRoutes);
     app.use('/students', studentsRoutes);
+    app.use('/subjects', subjectsRoutes);
 
     // Test route
     app.get('/', (_req: Request, res: Response) => {
