@@ -11,8 +11,23 @@ router.get('/', SubjectController.getAll);
 router.get('/:id', SubjectController.getById);
 
 // Protected routes (ADMIN only)
-router.post('/', authenticate, requireRole([UserRole.ADMIN]), SubjectController.create);
-router.put('/:id', authenticate, requireRole([UserRole.ADMIN]), SubjectController.update);
-router.delete('/:id', authenticate, requireRole([UserRole.ADMIN]), SubjectController.remove);
+router.post(
+  '/',
+  authenticate,
+  requireRole([UserRole.ADMIN]),
+  SubjectController.create,
+);
+router.put(
+  '/:id',
+  authenticate,
+  requireRole([UserRole.ADMIN]),
+  SubjectController.update,
+);
+router.delete(
+  '/:id',
+  authenticate,
+  requireRole([UserRole.ADMIN]),
+  SubjectController.remove,
+);
 
 export default router;

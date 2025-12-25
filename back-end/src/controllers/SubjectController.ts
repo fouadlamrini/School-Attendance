@@ -29,11 +29,13 @@ export class SubjectController {
   static async getById(req: Request<{ id: string }>, res: Response) {
     try {
       const id = Number(req.params.id);
-      if (Number.isNaN(id)) return res.status(400).json({ message: 'Invalid id parameter' });
+      if (Number.isNaN(id))
+        return res.status(400).json({ message: 'Invalid id parameter' });
 
       const repo = AppDataSource.getRepository(Subject);
       const subject = await repo.findOne({ where: { id } });
-      if (!subject) return res.status(404).json({ message: 'Subject not found' });
+      if (!subject)
+        return res.status(404).json({ message: 'Subject not found' });
 
       return res.status(200).json({ data: subject });
     } catch (err) {
@@ -56,7 +58,8 @@ export class SubjectController {
 
       // check unique name
       const existing = await repo.findOne({ where: { name: name.trim() } });
-      if (existing) return res.status(400).json({ message: 'Subject already exists' });
+      if (existing)
+        return res.status(400).json({ message: 'Subject already exists' });
 
       const subject = repo.create({ name: name.trim() });
       const saved = await repo.save(subject);
@@ -69,10 +72,14 @@ export class SubjectController {
   }
 
   // PUT /subjects/:id - update subject (ADMIN only)
-  static async update(req: Request<{ id: string }, {}, SubjectBody>, res: Response) {
+  static async update(
+    req: Request<{ id: string }, {}, SubjectBody>,
+    res: Response,
+  ) {
     try {
       const id = Number(req.params.id);
-      if (Number.isNaN(id)) return res.status(400).json({ message: 'Invalid id parameter' });
+      if (Number.isNaN(id))
+        return res.status(400).json({ message: 'Invalid id parameter' });
 
       const { name } = req.body;
       if (!name || typeof name !== 'string' || name.trim() === '') {
@@ -81,11 +88,13 @@ export class SubjectController {
 
       const repo = AppDataSource.getRepository(Subject);
       const subject = await repo.findOne({ where: { id } });
-      if (!subject) return res.status(404).json({ message: 'Subject not found' });
+      if (!subject)
+        return res.status(404).json({ message: 'Subject not found' });
 
       // check another subject with same name
       const other = await repo.findOne({ where: { name: name.trim() } });
-      if (other && other.id !== id) return res.status(400).json({ message: 'Subject name already in use' });
+      if (other && other.id !== id)
+        return res.status(400).json({ message: 'Subject name already in use' });
 
       subject.name = name.trim();
       const updated = await repo.save(subject);
@@ -100,11 +109,13 @@ export class SubjectController {
   static async remove(req: Request<{ id: string }>, res: Response) {
     try {
       const id = Number(req.params.id);
-      if (Number.isNaN(id)) return res.status(400).json({ message: 'Invalid id parameter' });
+      if (Number.isNaN(id))
+        return res.status(400).json({ message: 'Invalid id parameter' });
 
       const repo = AppDataSource.getRepository(Subject);
       const subject = await repo.findOne({ where: { id } });
-      if (!subject) return res.status(404).json({ message: 'Subject not found' });
+      if (!subject)
+        return res.status(404).json({ message: 'Subject not found' });
 
       await repo.remove(subject);
       return res.status(200).json({ message: 'Subject deleted' });
