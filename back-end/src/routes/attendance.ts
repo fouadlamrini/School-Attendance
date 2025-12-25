@@ -3,6 +3,7 @@ import AttendanceController from '../controllers/AttendanceController';
 import authenticate from '../middlewares/authenticate';
 import { requireRole } from '../middlewares/requireRole';
 import { UserRole } from '../entities/enums/Role';
+import AttendanceController from '../controllers/AttendanceController';
 
 const router = express.Router();
 
@@ -21,6 +22,30 @@ router.put(
   authenticate,
   requireRole([UserRole.TEACHER]),
   AttendanceController.update,
+);
+
+// GET attendance by session id (admin or teacher)
+router.get(
+  '/session/:id',
+  authenticate,
+  requireRole([UserRole.ADMIN, UserRole.TEACHER]),
+  AttendanceController.getBySession,
+);
+
+// GET attendance by student id (admin or teacher)
+router.get(
+  '/student/:id',
+  authenticate,
+  requireRole([UserRole.ADMIN, UserRole.TEACHER]),
+  AttendanceController.getByStudent,
+);
+
+// GET attendance by class id (admin or teacher)
+router.get(
+  '/class/:id',
+  authenticate,
+  requireRole([UserRole.ADMIN, UserRole.TEACHER]),
+  AttendanceController.getByClass,
 );
 
 export default router;

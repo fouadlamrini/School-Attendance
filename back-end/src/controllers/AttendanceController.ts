@@ -249,6 +249,132 @@ export class AttendanceController {
       return res.status(500).json({ message: 'Internal server error' });
     }
   }
+
+  /**
+   * GET /attendance/session/:id
+   * Return all attendance records for a given session id.
+   */
+  static async getBySession(req: Request<{ id: string }>, res: Response) {
+    try {
+      // Parse and validate session id from params
+      const id = Number(req.params.id);
+      if (Number.isNaN(id) || id <= 0) {
+        return res.status(400).json({ message: 'Invalid session id' });
+      }
+
+      // Ensure authenticated user exists (middleware should attach it)
+      if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
+
+      // Use repository to fetch attendance with nested relations
+      const attendanceRepo = AppDataSource.getRepository(Attendance);
+      const attendances = await attendanceRepo.find({
+        where: { session: { id } as any },
+        relations: [
+          'session',
+          'session.classEntity',
+          'session.subject',
+          'session.teacher',
+          'student',
+        ],
+      });
+
+      // Remove password from teacher on each attendance's session if present
+      attendances.forEach((a) => {
+        if (a.session && (a.session as any).teacher) {
+          delete ((a.session as any).teacher as any).password;
+        }
+      });
+
+      // Return results (200) even if empty array
+      return res.status(200).json({ data: attendances });
+    } catch (err) {
+      console.error('Error fetching attendance by session', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  /**
+   * GET /attendance/student/:id
+   * Return all attendance records for a given student id.
+   */
+  static async getByStudent(req: Request<{ id: string }>, res: Response) {
+    try {
+      // Parse and validate student id
+      const id = Number(req.params.id);
+      if (Number.isNaN(id) || id <= 0) {
+        return res.status(400).json({ message: 'Invalid student id' });
+      }
+
+      // Ensure authenticated
+      if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
+
+      // Fetch attendances for the student with nested session relations
+      const attendanceRepo = AppDataSource.getRepository(Attendance);
+      const attendances = await attendanceRepo.find({
+        where: { student: { id } as any },
+        relations: [
+          'session',
+          'session.classEntity',
+          'session.subject',
+          'session.teacher',
+          'student',
+        ],
+      });
+
+      // Strip teacher password if present
+      attendances.forEach((a) => {
+        if (a.session && (a.session as any).teacher) {
+          delete ((a.session as any).teacher as any).password;
+        }
+      });
+
+      return res.status(200).json({ data: attendances });
+    } catch (err) {
+      console.error('Error fetching attendance by student', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  /**
+   * GET /attendance/class/:id
+   * Return all attendance records for a given class id (all sessions of that class).
+   */
+  static async getByClass(req: Request<{ id: string }>, res: Response) {
+    try {
+      // Parse and validate class id
+      const classId = Number(req.params.id);
+      if (Number.isNaN(classId) || classId <= 0) {
+        return res.status(400).json({ message: 'Invalid class id' });
+      }
+
+      // Ensure authenticated
+      if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
+
+      // Use query builder to join through session -> classEntity and filter by class id
+      const attendanceRepo = AppDataSource.getRepository(Attendance);
+      const attendances = await attendanceRepo
+        .createQueryBuilder('attendance')
+        .leftJoinAndSelect('attendance.session', 'session')
+        .leftJoinAndSelect('session.classEntity', 'classEntity')
+        .leftJoinAndSelect('session.subject', 'subject')
+        .leftJoinAndSelect('session.teacher', 'teacher')
+        .leftJoinAndSelect('attendance.student', 'student')
+        .where('classEntity.id = :classId', { classId })
+        .getMany();
+
+      // Remove teacher password if present
+      attendances.forEach((a) => {
+        if ((a as any).session && (a as any).session.teacher) {
+          delete ((a as any).session.teacher as any).password;
+        }
+      });
+
+      return res.status(200).json({ data: attendances });
+    } catch (err) {
+      console.error('Error fetching attendance by class', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  }
 }
 
 export default AttendanceController;
