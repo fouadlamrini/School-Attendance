@@ -99,7 +99,12 @@ export class AuthController {
       }
 
       const userRepo = AppDataSource.getRepository(User);
-      const user: User | null = await userRepo.findOne({ where: { email } });
+      // password column is defined with select: false, so explicitly include it here
+      const user: User | null = await userRepo
+        .createQueryBuilder('user')
+        .addSelect('user.password')
+        .where('user.email = :email', { email })
+        .getOne();
 
       if (!user) {
         return res.status(400).json({ message: 'Invalid email or password' });
