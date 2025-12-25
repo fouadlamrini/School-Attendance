@@ -157,13 +157,23 @@ export class AttendanceController {
       // Persist to database
       const saved = await attendanceRepo.save(attendance);
 
-      // Load relations for the response (session and student)
+      // Load relations for the response: include nested session relations
       const result = await attendanceRepo.findOne({
         where: { id: saved.id },
-        relations: ['session', 'student'],
+        relations: [
+          'session',
+          'session.classEntity',
+          'session.subject',
+          'session.teacher',
+          'student',
+        ],
       });
 
-      // Return created attendance (201) with the persisted record
+      // Remove password from teacher object if present
+      if (result?.session?.teacher)
+        delete (result.session.teacher as any).password;
+
+      // Return created attendance (201) with the persisted record including session.className, teacher, subject
       return res.status(201).json({ data: result });
     } catch (err) {
       // Log the error for server-side debugging and return 500
@@ -198,11 +208,9 @@ export class AttendanceController {
         typeof status !== 'string' ||
         !allowedStatuses.includes(status as AttendanceStatus)
       ) {
-        return res
-          .status(400)
-          .json({
-            message: `status must be one of: ${allowedStatuses.join(', ')}`,
-          });
+        return res.status(400).json({
+          message: `status must be one of: ${allowedStatuses.join(', ')}`,
+        });
       }
 
       // Ensure authenticated
@@ -223,7 +231,19 @@ export class AttendanceController {
       attendance.status = status as AttendanceStatus;
       const updated = await attendanceRepo.save(attendance);
 
-      return res.status(200).json({ data: updated });
+      // Re-fetch with nested relations to include class, teacher and subject in the response
+      const result = await attendanceRepo.findOne({
+        where: { id: updated.id },
+        relations: [
+          'session',
+          'session.classEntity',
+          'session.subject',
+          'session.teacher',
+          'student',
+        ],
+      });
+
+      return res.status(200).json({ data: result });
     } catch (err) {
       console.error('Error updating attendance', err);
       return res.status(500).json({ message: 'Internal server error' });
