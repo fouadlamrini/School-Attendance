@@ -5,6 +5,7 @@ import classesRoutes from './routes/classes';
 import studentsRoutes from './routes/students';
 import subjectsRoutes from './routes/subjects';
 import sessionsRoutes from './routes/sessions';
+import attendanceRoutes from './routes/attendance';
 import { initializeDB } from './data-source';
 
 dotenv.config(); // Charger les variables d'environnement en premier
@@ -23,6 +24,7 @@ initializeDB()
     app.use('/students', studentsRoutes);
     app.use('/subjects', subjectsRoutes);
     app.use('/sessions', sessionsRoutes);
+    app.use('/attendance', attendanceRoutes);
 
     // Test route
     app.get('/', (_req: Request, res: Response) => {
