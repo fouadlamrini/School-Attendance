@@ -6,18 +6,8 @@ import { AppDataSource } from '../data-source';
 import { User } from '../entities/User';
 import { UserRole } from '../entities/enums/Role';
 
-type RegisterBody = {
-  name: string;
-  email: string;
-  password: string;
-  role?: UserRole;
-};
-
-type LoginBody = {
-  email: string;
-  password: string;
-  role?: UserRole;
-};
+type AuthBody = { email: string; password: string };
+type RegisterBody = AuthBody & { name: string; role?: UserRole };
 
 export class AuthController {
   // -------------------
@@ -27,60 +17,33 @@ export class AuthController {
     try {
       const { name, email, password, role } = req.body;
 
-      // Validation simple
-      if (!name || !email || !password) {
-        return res
-          .status(400)
-          .json({ message: 'Name, email and password are required' });
+      // Validation
+      if (!name?.trim() || !email?.trim() || !password) {
+        return res.status(400).json({ message: 'Name, email, and password are required' });
       }
-
-      if (!validator.isEmail(email)) {
-        return res.status(400).json({ message: 'Invalid email' });
-      }
-
-      if (password.length < 6) {
-        return res
-          .status(400)
-          .json({ message: 'Password must be at least 6 characters' });
-      }
+      if (!validator.isEmail(email)) return res.status(400).json({ message: 'Invalid email' });
+      if (password.length < 6) return res.status(400).json({ message: 'Password must be at least 6 characters' });
 
       const userRepo = AppDataSource.getRepository(User);
 
-      const existingUser: User | null = await userRepo.findOne({
-        where: { email },
-      });
-      if (existingUser) {
-        return res.status(400).json({ message: 'Email already in use' });
-      }
+      const existingUser = await userRepo.findOne({ where: { email } });
+      if (existingUser) return res.status(400).json({ message: 'Email already in use' });
 
-      // Hash password
-      const hashedPassword: string = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Déterminer le rôle
-      const usersCount = await userRepo.count();
-      let assignedRole: UserRole;
-      if (usersCount === 0) {
-        assignedRole = UserRole.ADMIN; // premier user devient admin
-      } else {
-        assignedRole = role || UserRole.STUDENT; // sinon role du body ou default STUDENT
-      }
+      // First user becomes ADMIN automatically
+      const assignedRole: UserRole = (await userRepo.count()) === 0
+        ? UserRole.ADMIN
+        : role || UserRole.STUDENT;
 
-      // Créer user
-      const user: User = userRepo.create({
-        name,
-        email,
-        password: hashedPassword,
-        role: assignedRole,
-      });
+      const user = userRepo.create({ name, email, password: hashedPassword, role: assignedRole });
+      const savedUser = await userRepo.save(user);
 
-      const savedUser: User = await userRepo.save(user);
-      const safeUser = await userRepo.findOne({
-        where: { email },
-      });
-
+      // Return without password
+      const safeUser = await userRepo.findOne({ where: { id: savedUser.id } });
       return res.status(201).json(safeUser);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       return res.status(500).json({ message: 'Internal server error' });
     }
   }
@@ -88,70 +51,39 @@ export class AuthController {
   // -------------------
   // LOGIN
   // -------------------
-static async login(req: Request<{}, {}, LoginBody>, res: Response) {
-  try {
-    const { email, password } = req.body;
+  static async login(req: Request<{}, {}, AuthBody>, res: Response) {
+    try {
+      const { email, password } = req.body;
+      if (!email?.trim() || !password) return res.status(400).json({ message: 'Email and password are required' });
 
-    // Validation
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: 'Email and password are required' });
+      const userRepo = AppDataSource.getRepository(User);
+
+      // Fetch user with password
+      const userWithPassword = await userRepo
+        .createQueryBuilder('user')
+        .addSelect('user.password')
+        .where('user.email = :email', { email })
+        .getOne();
+
+      if (!userWithPassword) return res.status(400).json({ message: 'Invalid email or password' });
+
+      const isMatch = await bcrypt.compare(password, userWithPassword.password);
+      if (!isMatch) return res.status(400).json({ message: 'Invalid email or password' });
+
+      const secret = process.env.JWT_SECRET;
+      if (!secret) return res.status(500).json({ message: 'Authentication not configured' });
+
+      const token = jwt.sign({ userId: userWithPassword.id, role: userWithPassword.role }, secret, { expiresIn: '7d' });
+
+      // Return user without password
+      const safeUser = await userRepo.findOne({ where: { id: userWithPassword.id } });
+
+      return res.status(200).json({ token, user: safeUser });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Internal server error' });
     }
-
-    const userRepo = AppDataSource.getRepository(User);
-
-    
-    const userWithPassword: User | null = await userRepo
-      .createQueryBuilder('user')
-      .addSelect('user.password')
-      .where('user.email = :email', { email })
-      .getOne();
-
-    if (!userWithPassword) {
-      return res.status(400).json({ message: 'Invalid email or password' });
-    }
-
-    
-    const isMatch: boolean = await bcrypt.compare(
-      password,
-      userWithPassword.password,
-    );
-
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid email or password' });
-    }
-
-  
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-      console.error('Missing JWT_SECRET');
-      return res
-        .status(500)
-        .json({ message: 'Authentication not configured' });
-    }
-
-    const token: string = jwt.sign(
-      { userId: userWithPassword.id, role: userWithPassword.role },
-      secret,
-      { expiresIn: '7d' },
-    );
-
-    
-    const safeUser = await userRepo.findOne({
-      where: { id: userWithPassword.id },
-    });
-
-    return res.status(200).json({
-      token,
-      user: safeUser,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Internal server error' });
   }
-}
-
 }
 
 export default AuthController;
