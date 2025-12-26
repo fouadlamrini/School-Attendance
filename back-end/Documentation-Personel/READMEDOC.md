@@ -13,7 +13,7 @@
 # save()
 # relations
 # createQueryBuildder()
-# leftJoinAndSelect
+
 # getMany()
 # addSelect
 # getOne()

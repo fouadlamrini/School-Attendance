@@ -15,20 +15,29 @@ type SessionBody = {
 
 export class SessionController {
   // Helper: find class, subject, teacher by name
-  private static async findRelations(body: SessionBody, reqUser?: User) {
+  private static async findRelations(
+    body: SessionBody,
+    reqUser?: { id: number; role: UserRole },
+  ) {
     const classRepo = AppDataSource.getRepository(Class);
     const subjectRepo = AppDataSource.getRepository(Subject);
     const userRepo = AppDataSource.getRepository(User);
 
-    const classEntity = await classRepo.findOne({ where: { name: body.className.trim() } });
+    const classEntity = await classRepo.findOne({
+      where: { name: body.className.trim() },
+    });
     if (!classEntity) throw new Error('Invalid className');
 
-    const subject = await subjectRepo.findOne({ where: { name: body.subjectName.trim() } });
+    const subject = await subjectRepo.findOne({
+      where: { name: body.subjectName.trim() },
+    });
     if (!subject) throw new Error('Invalid subjectName');
 
     let teacher: User | null = null;
     if (body.teacherName?.trim()) {
-      teacher = await userRepo.findOne({ where: { name: body.teacherName.trim() } });
+      teacher = await userRepo.findOne({
+        where: { name: body.teacherName.trim() },
+      });
       if (!teacher) throw new Error('Invalid teacherName');
     } else if (reqUser?.role === UserRole.TEACHER) {
       teacher = await userRepo.findOne({ where: { id: reqUser.id } });
@@ -53,14 +62,16 @@ export class SessionController {
   // GET /sessions/:id
   static async getById(req: Request<{ id: string }>, res: Response) {
     const id = Number(req.params.id);
-    if (Number.isNaN(id)) return res.status(400).json({ message: 'Invalid id parameter' });
+    if (Number.isNaN(id))
+      return res.status(400).json({ message: 'Invalid id parameter' });
 
     try {
       const session = await AppDataSource.getRepository(Session).findOne({
         where: { id },
         relations: ['classEntity', 'subject', 'teacher'],
       });
-      if (!session) return res.status(404).json({ message: 'Session not found' });
+      if (!session)
+        return res.status(404).json({ message: 'Session not found' });
       return res.status(200).json({ data: session });
     } catch (err) {
       console.error(err);
@@ -73,14 +84,27 @@ export class SessionController {
     try {
       const { date } = req.body;
       if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date))
-        return res.status(400).json({ message: 'date is required in YYYY-MM-DD format' });
+        return res
+          .status(400)
+          .json({ message: 'date is required in YYYY-MM-DD format' });
 
-      const { classEntity, subject, teacher } = await SessionController.findRelations(req.body, req.user);
+      const { classEntity, subject, teacher } =
+        await SessionController.findRelations(req.body, req.user);
 
       const sessionRepo = AppDataSource.getRepository(Session);
-      const saved = await sessionRepo.save(sessionRepo.create({ date, classEntity, subject, teacher: teacher as User }));
+      const saved = await sessionRepo.save(
+        sessionRepo.create({
+          date,
+          classEntity,
+          subject,
+          teacher: teacher as User,
+        }),
+      );
 
-      const result = await sessionRepo.findOne({ where: { id: saved.id }, relations: ['classEntity', 'subject', 'teacher'] });
+      const result = await sessionRepo.findOne({
+        where: { id: saved.id },
+        relations: ['classEntity', 'subject', 'teacher'],
+      });
       return res.status(201).json({ data: result });
     } catch (err: any) {
       console.error(err);
@@ -90,20 +114,28 @@ export class SessionController {
   }
 
   // PUT /sessions/:id
-  static async update(req: Request<{ id: string }, {}, SessionBody>, res: Response) {
+  static async update(
+    req: Request<{ id: string }, {}, SessionBody>,
+    res: Response,
+  ) {
     const id = Number(req.params.id);
-    if (Number.isNaN(id)) return res.status(400).json({ message: 'Invalid id parameter' });
+    if (Number.isNaN(id))
+      return res.status(400).json({ message: 'Invalid id parameter' });
 
     try {
       const { date } = req.body;
       if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date))
-        return res.status(400).json({ message: 'date is required in YYYY-MM-DD format' });
+        return res
+          .status(400)
+          .json({ message: 'date is required in YYYY-MM-DD format' });
 
       const sessionRepo = AppDataSource.getRepository(Session);
       const session = await sessionRepo.findOne({ where: { id } });
-      if (!session) return res.status(404).json({ message: 'Session not found' });
+      if (!session)
+        return res.status(404).json({ message: 'Session not found' });
 
-      const { classEntity, subject, teacher } = await SessionController.findRelations(req.body, req.user);
+      const { classEntity, subject, teacher } =
+        await SessionController.findRelations(req.body, req.user);
 
       session.date = date;
       session.classEntity = classEntity;
@@ -111,7 +143,10 @@ export class SessionController {
       session.teacher = teacher as User;
 
       const updated = await sessionRepo.save(session);
-      const result = await sessionRepo.findOne({ where: { id: updated.id }, relations: ['classEntity', 'subject', 'teacher'] });
+      const result = await sessionRepo.findOne({
+        where: { id: updated.id },
+        relations: ['classEntity', 'subject', 'teacher'],
+      });
       return res.status(200).json({ data: result });
     } catch (err: any) {
       console.error(err);
@@ -123,12 +158,14 @@ export class SessionController {
   // DELETE /sessions/:id
   static async remove(req: Request<{ id: string }>, res: Response) {
     const id = Number(req.params.id);
-    if (Number.isNaN(id)) return res.status(400).json({ message: 'Invalid id parameter' });
+    if (Number.isNaN(id))
+      return res.status(400).json({ message: 'Invalid id parameter' });
 
     try {
       const sessionRepo = AppDataSource.getRepository(Session);
       const session = await sessionRepo.findOne({ where: { id } });
-      if (!session) return res.status(404).json({ message: 'Session not found' });
+      if (!session)
+        return res.status(404).json({ message: 'Session not found' });
 
       await sessionRepo.remove(session);
       return res.status(200).json({ message: 'Session deleted' });
