@@ -1,0 +1,59 @@
+notion: export
+============================================================================
+1️⃣ chno howa export?
+export kytst3ml bach tkhrj variable / class / function / type  mn file
+    o t9dr tst3mlha f les files lkhrin fach ktkhdm import.
+
+📌 kol file f TS/JS howa module.
+============================================================================
+naw3 1: export class (Named Export)
+// File: User.ts
+export class User {
+  id: number;
+  name: string;
+}
+📌 hna
+ism dyal class howa User
+
+khas nstkhdm nafs smiya f import
+=============================================================================
+3️⃣ كيفاش كنستعملو؟
+import { User } from './User';
+📌 { } daroriya 7it hada named export
+=============================================================================
+4️⃣ فين كيتستعمل export class؟
+
+Entities (TypeORM)
+
+Services
+
+Controllers
+
+Utils
+=============================================================================
+naw3 2: export default (Default Export)
+5️⃣ Syntax général
+export default class UserController {
+  create() {}
+}
+ file fih export wa7d iftiradi
+ ============================================================================
+6️⃣ كيفاش كنستعملو؟
+import UserController from './UserController';
+📌 ma kaynach { } 7it hada default export
+t9dr tbdl smiya f import 
+=============================================================================
+7️⃣  fin kytst3ml export default?
+Controllers
+
+Middleware
+
+Config files
+==============================================================================
+ lfar9 l2asasi bin export o export default
+
+ |point                  |export                  |export default
+ | l3adad                |bazaf                   |wa7d osf
+ |ism                    |darori                  |ikhtiyari
+ |import                 |{name}                  |name
+ |isti3mal               |Entities/types          |Controllers/Middleware

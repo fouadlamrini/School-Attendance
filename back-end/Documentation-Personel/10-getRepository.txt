@@ -1,0 +1,45 @@
+notion getRepository
+============================================
+1️⃣ chno howa getRepository?
+getRepository hiya method man TypeORM (DataSource) kaymaknak bach tat3aml m3a database bsohola 3la mostawa entity mo3ayan.
+
+Repository = object fih jmi3 operation asasiya (CRUD)  lkhasa b entity.
+
+kola entity 3ndo repository mosta9il.
+
+f TypeORM 0.3.x، knst3ml DataSource instance  bach njib repository، machi mobachara mn typeorm.
+=============================================
+2️⃣ Syntax général
+import { AppDataSource } from '../data-source';
+import { entityClass } from '../entities/entityClass';
+
+const entityClasseRepo = AppDataSource.getRepository(entityClass);
+entityClass:smiya dyal class dyal entities dyawli (model)
+=============================================
+3️⃣ fonctionalite essentiel dyal repository
+entityClasseRepo.find()
+
+entityClasseRepo.findOne()
+
+entityClasseRepo.create()
+
+entityClasseRepo.save()
+
+entityClasseRepo.remove()
+
+entityClassRepo.createQueryBuilder()
+=============================================
+4️⃣mnin katji getRepository?
+katji mn DataSource instance li katmthal connection m3a database.
+f TypeORM 0.3.x، khasna n3mlo instance dyal DataSource w nconnectiw biha database
+1-import { DataSource } from 'typeorm';
+DataSource howa class ja mn typeorm fih method getRepository
+2- n3mlo instance dyal DataSource
+export const AppDataSource = new DataSource({})
+3- nconnectiw biha database
+AppDataSource.initialize()
+4-f chi fichier khor controller matalan 
+kandir import { AppDataSource } from '../data-source';
+5-w kanst3mlo AppDataSource.getRepository(EntityClass)
+
+

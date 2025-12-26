@@ -1,0 +1,38 @@
+notion: static
+====================================================
+1️⃣ chno howa static?
+static kt3ni ana methode ktba3 class nafso
+ machi instance dyalo
+ ya3ni
+ knst3mlha mobachara mn ClassName
+makan7tajoch ndiro new
+====================================================
+2️⃣ static  f context dyali (Controller)
+export class AttendanceController {
+  static async create(req: Request, res: Response) {
+    ...
+  }
+}
+📌 hna:
+
+create ma mrbotch b object
+ mrbota b AttendanceController nafso
+ ====================================================
+3️⃣  kifach knst3ml static f routes?
+router.post(
+  '/attendance',
+  AttendanceController.create
+);
+
+bla ma ndir 
+new AttendanceController().create ❌
+====================================================
+4️⃣ 3lach static monasiba l Controllers؟
+
+kol request mosta9il
+
+code kykon simple et clean
+
+performance a7san (ma kaytkhl9ch object)
+
+📌 controller = logic osafi → static howa ikhtiyar tabi3i

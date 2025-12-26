@@ -3,7 +3,6 @@ import AttendanceController from '../controllers/AttendanceController';
 import authenticate from '../middlewares/authenticate';
 import { requireRole } from '../middlewares/requireRole';
 import { UserRole } from '../entities/enums/Role';
-import AttendanceController from '../controllers/AttendanceController';
 
 const router = express.Router();
 

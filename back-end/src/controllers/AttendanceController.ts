@@ -169,10 +169,7 @@ export class AttendanceController {
         ],
       });
 
-      // Remove password from teacher object if present
-      if (result?.session?.teacher)
-        delete (result.session.teacher as any).password;
-
+     
       // Return created attendance (201) with the persisted record including session.className, teacher, subject
       return res.status(201).json({ data: result });
     } catch (err) {
@@ -278,13 +275,7 @@ export class AttendanceController {
         ],
       });
 
-      // Remove password from teacher on each attendance's session if present
-      attendances.forEach((a) => {
-        if (a.session && (a.session as any).teacher) {
-          delete ((a.session as any).teacher as any).password;
-        }
-      });
-
+    
       // Return results (200) even if empty array
       return res.status(200).json({ data: attendances });
     } catch (err) {
@@ -321,12 +312,7 @@ export class AttendanceController {
         ],
       });
 
-      // Strip teacher password if present
-      attendances.forEach((a) => {
-        if (a.session && (a.session as any).teacher) {
-          delete ((a.session as any).teacher as any).password;
-        }
-      });
+    
 
       return res.status(200).json({ data: attendances });
     } catch (err) {
@@ -362,12 +348,7 @@ export class AttendanceController {
         .where('classEntity.id = :classId', { classId })
         .getMany();
 
-      // Remove teacher password if present
-      attendances.forEach((a) => {
-        if ((a as any).session && (a as any).session.teacher) {
-          delete ((a as any).session.teacher as any).password;
-        }
-      });
+     
 
       return res.status(200).json({ data: attendances });
     } catch (err) {

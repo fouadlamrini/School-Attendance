@@ -1,0 +1,67 @@
+notion: type (Type Alias)
+====================================================================
+1️⃣ شنو هو type؟
+type kysm7 lik t3rf chkal (structure) dyal data,chno howa propriete o chno howa type dyal kola propriete
+kytst3ml bzaf m3a objects/request body/props/responses
+====================================================================
+2️⃣ Type بسيط (Primitive)
+type UserId = number;
+type Username = string;
+type IsActive = boolean;
+====================================================================
+3️⃣ Type Object (الأكثر استعمالاً)
+type User = {
+  id: number;
+  name: string;
+  email: string;
+};
+====================================================================
+4️⃣ Optional properties
+type User = {
+  id: number;
+  name: string;
+  age?: number;
+};
+📌 ? = الخاصية اختيارية.
+====================================================================
+5️⃣ Union Types (OR)
+type Status = 'active' | 'inactive' | 'banned';
+type Id = number | string;
+📌 القيمة خاصها تكون واحد من هاد الأنواع فقط.
+
+=====================================================================
+6️⃣ Type Array
+type Numbers = number[];
+type Users = User[];
+او 
+type Numbers = Array<number>;
+====================================================================
+8️⃣ Type Tuple (Array بطول وأنواع محددة)
+type POINTS = [number, number, number];
+
+kola position 3ndo type mohadad.
+====================================================================
+9️⃣ Type Functions
+type Add = (a: number, b: number) => number;
+مثال آخر:
+type Greet = (name: string) => void;
+====================================================================
+9️⃣ Type للـ Request / API
+type CreateUserBody = {
+  name: string;
+  email: string;
+  password: string;
+};
+واستعمال:
+(req: Request<{}, {}, CreateUserBody>, res: Response)
+====================================================================
+🔟 Type مع Generics
+type ApiResponse<T> = {
+  data: T;
+  success: boolean;
+};
+استعمال:
+type UserResponse = ApiResponse<User>;
+
+
+

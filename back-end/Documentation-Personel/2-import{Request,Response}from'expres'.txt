@@ -1,0 +1,13 @@
+notion: import { Request, Response } from 'express';
+=========================================================================
+1️⃣ شنو كيدير هاد السطر؟
+kaydir import l types mn maktaba dyal express:
+Request o Response bach typesScript yfhm chkal dyal req o res
+=========================================================================
+2️⃣ شنو هما Request و Response؟
+Request: kaymatal talab HTTP (body، params، query، headers)
+Response: kaymatal radd HTTP (status, json, send)
+=========================================================================
+3️⃣ فين كيتستعملو غالبًا؟
+Controllers
+Middlewares (مع NextFunction)

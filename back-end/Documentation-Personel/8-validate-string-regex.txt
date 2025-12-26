@@ -1,0 +1,43 @@
+notion:  /^\d{4}-\d{2}-\d{2}$/.test(date)
+=========================================================
+1️⃣ chno howa had star?
+had star kytst3ml bach nt7a9a9 mn  sigha dyal text (string) kankhdmo b regular expression (RegEx).
+
+^\d{4}-\d{2}-\d{2}$ = pattern dyal date bsigha dyal YYYY-MM-DD
+
+.test(date) = retourne true ila kan  texte mntab9 m3a pattern,  false ila ma mantab9ch
+==========================================================
+2️⃣ char7 dyal pattern ^\d{4}-\d{2}-\d{2}$:
+
+^ = lbdya dyal string
+\d{4} = 4 arqam (0-9) katmthal l3am (YYYY)
+- = dash katfr9 bin l3am w chhr
+\d{2} = 2 arqam katmthal lchhr (MM)
+- = dash katfr9 bin lchhr w nhar
+\d{2} = 2 arqam katmthal lnhar (DD)
+$ = nihaya dyal string
+✅  exemple sa7i7: "2025-12-26"
+❌  exemple khata2: "25-12-26" wla "2025/12/26"
+==========================================================
+\d =ayi ra9m mn 0 l 9
+{n} = 3adad marat tikrar
+fin momkin nst3mlhom?
+- validation dyal dates
+- validation dyal phone numbers
+- validation dyal postal codes....
+exemple:
+const str1 = "1234";
+console.log(/^\d{4}$/.test(str1)); // true
+
+const str2 = "567890";
+console.log(/^\d{4}$/.test(str2)); // false, 7it fih aktar mn 4 ar9am
+
+===========================================================
+3️⃣kifach kansta3mlo f validation?
+const date = "2025-12-26";
+if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+  console.log("Invalid date format");
+} else {
+  console.log("Valid date");
+}
+===========================================================

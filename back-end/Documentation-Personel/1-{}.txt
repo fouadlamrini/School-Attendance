@@ -1,0 +1,98 @@
+notion: { }
+contexte: import { Request, Response } from 'express';
+========================================================================
+1️⃣ Syntax général
+// Named import
+import { Request, Response } from 'express';
+
+// Default import
+import express from 'express';
+
+// Import كل ما هو مُصدَّر
+import * as express from 'express';
+========================================================================
+2️⃣ Explication (شنو كتعني {} ؟)
+
+al2a9was {} f import ktst3ml ghir m3a:
+
+Named Exports
+يعني:
+الموديول (الملف) صدّر عناصر بأسمائها، وانت كتطلبهم بالاسم ديالهم.
+في المقابل، ملي ما كاتستعملش {}، فهذا يعني أنك كتستورد:
+إما Default Export
+أو كل الموديول
+========================================================================
+3️⃣ lfar9 ma bin import { ... } و import X from ...
+✅ import { Request, Response } from 'express'
+
+Request و Response ماشي default
+
+homa Types msamyin (named exports)
+
+darori tkhdm {} wla ghadi i3tik erreur
+
+✔️ يُستعمل مع:
+Types
+Interfaces
+Enums
+Helpers
+
+✅ import express from 'express'
+
+express هو default export
+
+كتمثّل الموديول كامل
+
+✔️ يُستعمل غالبًا لإنشاء app:
+const app = express();
+========================================================================
+4️⃣ علاش فـ الكود ديالك {} ضرورية؟
+📌 لأن:
+Request و Response exports مسمّيين
+express ما كيصدّرشهم كـ default
+========================================================================
+6️⃣ Named Export من ملف شخصي
+
+داخل الملف:
+export class Attendance {}
+export enum AttendanceStatus {}
+الاستيراد:
+import { Attendance, AttendanceStatus } from './path/to/file';
+📌 {} هنا ضرورية.
+========================================================================
+7️⃣ Default Export (بلا {})
+داخل الملف:
+export default class User {}
+الاستيراد:
+import User from './path/to/file';
+📌 {} هنا غير ضرورية.
+========================================================================
+8️⃣ Import كل شيء (* as)
+import * as express from 'express';
+📌 نادر الاستعمال، لكن مفيد في:
+
+Libraries قديمة
+
+أو testing
+========================================================================
+9️⃣ أشهر حالات الاستعمال (Cas d’utilisation populaires)
+✔️ {} تُستعمل مع:
+
+Request, Response, NextFunction
+
+Entity, Column, ManyToOne
+
+getRepository
+
+enum
+
+interface
+
+type
+
+Helpers متعددة من نفس الملف
+
+✔️ بلا {} تُستعمل مع:
+express, Router, jsonwebtoken, bcrypt
+
+classes مُصدّرة كـ default

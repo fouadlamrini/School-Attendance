@@ -1,0 +1,94 @@
+notion: Union Types (|)
+============================================================================
+1️⃣chno howa Union Type?
+union kysm7 lik t9ol ana l9ima t9dr tkwn mn aktar mn type w7da wlkn ghir wa7d f kola mara
+مثال:
+type Id = number | string;
+hadi kat3ni blly l9ima dyal Id t9dr tkwn number aw string
+============================================================================
+2️⃣ 3lach knst3ml Union?
+باش نكونو مرنين
+
+ونبقاو محميين من الأخطاء
+
+ونعوّضو any بطريقة آمنة
+============================================================================
+3️⃣ Union m3a l9iyam (Literal Union)
+type Status = 'present' | 'absent' | 'late' | 'excused';
+📌 هنا:
+
+status ما يمكنش يكون أي string
+
+خاصو يكون واحد من هاد القيم فقط
+
+🔹 استعمال شائع:
+
+status
+
+roles
+
+state
+
+enums خفيفة
+============================================================================
+4️⃣ Union m3a Types mkhtakfin
+type Result = string | number | boolean;
+📌 فين كتستعمل؟
+
+API responses
+
+input ديال user
+
+parsing data
+============================================================================
+5️⃣ Union m3a Types Objects
+type SuccessResponse = {
+  success: true;
+  data: string;
+};
+
+type ErrorResponse = {
+  success: false;
+  error: string;
+};
+
+type ApiResponse = SuccessResponse | ErrorResponse;
+=============================================================================
+6️⃣ kifach TypeScript kyt3aml m3a Union?
+function printId(id: number | string) {
+  if (typeof id === 'string') {
+    console.log(id.toUpperCase());
+  } else {
+    console.log(id.toFixed(2));
+  }
+}
+📌 TypeScript ky3rf type 3la hsab naw3
+==============================================================================
+7️⃣ Union في Express (Request Body)
+type Role = 'ADMIN' | 'TEACHER' | 'STUDENT';
+
+type CreateUserBody = {
+  name: string;
+  role: Role;
+};
+📌 kymn3 role machi m3rofa tji mn frontend
+==============================================================================
+8️⃣ Union vs any
+type Data = string | number; // ✅
+type BadData = any;         // ❌
+==============================================================================
+🧠 الخلاصة
+
+| = OR
+
+القيمة خاصها تكون واحد فقط من الأنواع
+
+كيتستعمل بزاف فـ:
+
+status
+
+roles
+
+API responses
+
+validation logic

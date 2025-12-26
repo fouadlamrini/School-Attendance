@@ -1,0 +1,30 @@
+notion: any
+============================================
+1️⃣ chno howa any f TypeScript?
+
+any howa type kay3atal TypeScript
+
+kay9olo:
+👉 “matswlnich 3la type khlini ndoz
+
+ mnin kanst3ml any، TypeScript ma kaydir 7ata validation la 3la structure la 3la properties.
+
+📌 rasmiyan:
+
+any =   ilgha2 systeme typing
+=============================================
+2️⃣ 3lach khdmna as any hna?
+f TypeORM، l3ala9a:
+Session {
+  classEntity: Class
+}
+o TypeORM kytw93 f where:
+classEntity: Class
+wlkn ana 3tito
+classEntity: { id: number }
+TypeScript kay9ol:
+ hada machi Class، hada object fih ghir id
+ 3️⃣ 3lach any khatar?
+ ⚠️ 7it:
+TypeScript makayb9ach y7mik
+bugs katatla3 f runtime

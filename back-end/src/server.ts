@@ -28,11 +28,7 @@ initializeDB()
     app.use('/attendance', attendanceRoutes);
     app.use('/stats', statsRoutes);
 
-    // Test route
-    app.get('/', (_req: Request, res: Response) => {
-      res.send('API is running');
-    });
-
+  
     // Démarrage serveur
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {

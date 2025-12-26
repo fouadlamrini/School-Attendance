@@ -1,0 +1,31 @@
+notion:/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(studentEmail)
+=========================================================
+1️⃣ chno howa had star?
+had star kytst3ml bach nt7a9a9 mn sigha dyal email kankhdmo b regular expression (RegEx).
+/^[^@\s]+@[^@\s]+\.[^@\s]+$/ = pattern dyal email
+.test(studentEmail) = retourne true ila kan texte mntab9 m3a pattern, false ila ma mantab9ch
+==========================================================
+2️⃣ char7 dyal pattern /^[^@\s]+@[^@\s]+\.[^@\s]+$/:
+^ = lbdya dyal string
+[^@\s]+ = ay 7aja machi @ w machi spaces, katmthal smiya dyal luser (local part)
+@ = katfr9 bin smiya dyal luser w smiya dyal domain
+[^@\s]+ = ay 7aja machi @ w machi spaces, katmthal smiya dyal domain
+\. = dot katfr9 bin smiya dyal domain w tld
+[^@\s]+ = ay 7aja machi @ w machi spaces, katmthal tld (top-level domain) b7al com, net, org...
+$ = nihaya dyal string
+✅ exemple sa7i7: "student@example.com"
+❌ exemple khata2: "student@ example.com" wla "studentexample.com"
+===============================================================
+^: fach katkon flwal kt3ni bidaya dyal string
+[]=majmo3a dyal 7orof
+ay 7aja ma bin [] kat3ni chno li mmno3 o chno li msmo7
+^: ila kant fbidaya dyal majmo3a kt3ni nafy [^ ]
+\s:kat3ni space,tab ,new line...
+==========================================================
+3️⃣ isti3mal cha2i3
+const email = "fouad.lamrini@example.com";
+if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+  console.log("Email non valide");
+} else {
+  console.log("Email valide");
+}

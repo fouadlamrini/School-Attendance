@@ -1,0 +1,54 @@
+notion: req: Request<{}, {}, CreateAttendanceBody>, res: Response
+=================================================================
+1️⃣ chno howa req w res?
+req = Request →  kay7tawi 3la ay 7aja jat mn client:
+
+req.body →  data li tsiftat
+
+req.params →  variable f URL
+
+req.query → query string
+
+req.headers → headers
+
+res = Response →  bach nrj3o response l client:
+
+res.json(...), res.send(...), res.status(...)
+=================================================================
+2️⃣ chno kay3ni <{}, {}, CreateAttendanceBody> f TypeScript?
+req: Request<Params, ResBody, ReqBody>
+ naw3 1 {} → URL params (exemple /users/:id)
+
+ naw3 2 {} → Response body type (optionel)
+
+naw3 3  CreateAttendanceBody → naw body li msift man client 
+=================================================================
+3️⃣  3lach mohim f Express + TypeScript؟
+
+autocompletion f VS Code: req.body.className
+
+ ky9lal akhta2 runtime
+
+validation ashal: TypeScript  y3rf kola property o type dyalo
+
+ mofid f Controllers؟
+ =================================================================
+ 4️⃣  isti3mal cha2i3
+ static async create(
+  req: Request<{}, {}, CreateAttendanceBody>,
+  res: Response
+) {
+  const { className, date, studentName, studentEmail, status } = req.body;
+
+  if (!className) return res.status(400).json({ message: 'className required' });
+  
+  // ba9ui lcode hna ..........
+}
+
+
+hna TypeScript:
+
+kay3rf req.body.className = string
+
+req.body.status = union 'present' | 'absent' | 'late' | 'excused'
+====================================================================
