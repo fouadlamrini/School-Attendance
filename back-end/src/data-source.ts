@@ -17,11 +17,9 @@ export const AppDataSource = new DataSource({
   username: process.env.PG_USER,
   password: process.env.PG_PASSWORD,
   database: process.env.PG_DATABASE,
-  synchronize: true, // seulement pour dev
+  synchronize: true, // dev only
   logging: false,
   entities: [User, Class, Student, Subject, Session, Attendance],
-  migrations: [],
-  subscribers: [],
 });
 
 export const initializeDB = async () => {
@@ -29,7 +27,7 @@ export const initializeDB = async () => {
     await AppDataSource.initialize();
     console.log('PostgreSQL connected via TypeORM');
   } catch (err) {
-    console.error('Error during Data Source initialization', err);
+    console.error('DB initialization error', err);
     process.exit(1);
   }
 };

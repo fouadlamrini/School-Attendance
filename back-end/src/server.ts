@@ -1,5 +1,6 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import dotenv from 'dotenv';
+import { initializeDB } from './data-source';
 import authRoutes from './routes/auth';
 import classesRoutes from './routes/classes';
 import studentsRoutes from './routes/students';
@@ -7,14 +8,13 @@ import subjectsRoutes from './routes/subjects';
 import sessionsRoutes from './routes/sessions';
 import attendanceRoutes from './routes/attendance';
 import statsRoutes from './routes/stats';
-import { initializeDB } from './data-source';
 
-dotenv.config(); // Charger les variables d'environnement en premier
+dotenv.config();
 
 const app = express();
-app.use(express.json()); // Middleware pour parser le JSON
+app.use(express.json());
 
-// Initialiser la DB avant de démarrer le serveur
+// Initialiser la DB et démarrer le serveur
 initializeDB()
   .then(() => {
     console.log('Database initialized');
@@ -28,14 +28,10 @@ initializeDB()
     app.use('/attendance', attendanceRoutes);
     app.use('/stats', statsRoutes);
 
-  
-    // Démarrage serveur
     const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
   .catch((err) => {
     console.error('Failed to initialize database', err);
-    process.exit(1); // Quitter si la DB ne démarre pas
+    process.exit(1);
   });
