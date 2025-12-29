@@ -1,0 +1,20 @@
+notion: join()
+========================================================================
+1️⃣chno howa join?
+join hiya method dyal Array f JavaScript/TypeScript
+
+kat7awal array l string
+
+kayamkn t7adad separator bin les elements .
+========================================================================
+2️⃣ syntax:
+array.join(separator?: string): string
+separator (optionel) → l3alama li ghadi tfsl bin elements
+
+ila ma 3titoch default howa ,
+========================================================================
+3️⃣ exemple:
+const fruits = ['apple', 'banana', 'orange'];
+fruits.join();        // "apple,banana,orange"
+fruits.join(', ');    // "apple, banana, orange"
+fruits.join(' | ');   // "apple | banana | orange"

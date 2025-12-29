@@ -1,0 +1,60 @@
+notion: save()
+============================================
+1️⃣ chno howa save()?
+save() hiya method dyal Repository f TypeORM
+
+katst3ml bach tsjl object f database
+
+katdir:
+
+INSERT ila kan object jdid
+
+UPDATE ila kan object mawjod (3ndo id)
+
+📌 نفس الدالة كتخدم للحالتين.
+=============================================
+2️⃣ Syntax général
+repository.save(entity)
+=============================================
+3️⃣ السياق ديالك
+const attendance = attendanceRepo.create({
+  status: validStatus,
+  session,
+  student,
+});
+
+const saved = await attendanceRepo.save(attendance);
+
+🔹 create()
+
+kat creer object f dakira osf
+
+ma kadir 7ata 7aja fـdatabase
+
+
+const attendance = attendanceRepo.create({...});
+🔹 save()
+
+katchad hadak object
+
+katamchi l database
+
+katdir INSERT
+
+okatrj3 object ma7fod fih:
+
+id
+
+createdAt
+
+ayi column auto-generated
+const saved = await attendanceRepo.save(attendance);
+====================================================================
+4️⃣ lfar9 bin create o save
+| create()                          | save()                           |
+|----------------------------------|----------------------------------|
+| katsayb object f memoire osf   | katsjl object f database         |
+| ma katdir 7ata 7aja f database  | katdir INSERT UPDATE f database  |
+| katrj3 object jdida f dakira    | katrj3 object ma7fod f database  |
+📌 bazaf dyal nas kayghlto okydno create() katsjl → la makatsjlch.
+====================================================================

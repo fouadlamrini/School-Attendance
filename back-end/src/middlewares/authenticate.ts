@@ -4,7 +4,7 @@ import { AppDataSource } from '../data-source';
 import { User } from '../entities/User';
 import { UserRole } from '../entities/enums/Role';
 
-// نضيفو `user` للـ Request ديال Express
+
 declare global {
   namespace Express {
     interface Request {
@@ -13,9 +13,7 @@ declare global {
   }
 }
 
-/**
- * Middleware للتحقق من JWT و attach ديال `{ id, role }` للـ req.user
- */
+
 export async function authenticate(req: Request, res: Response, next: NextFunction) {
   try {
     const authHeader = req.header('Authorization') || req.header('authorization');

@@ -27,7 +27,6 @@ entityClasseRepo.save()
 
 entityClasseRepo.remove()
 
-entityClassRepo.createQueryBuilder()
 =============================================
 4️⃣mnin katji getRepository?
 katji mn DataSource instance li katmthal connection m3a database.

@@ -1,0 +1,15 @@
+notion: where
+==================================================================
+1️⃣ chno howa where?
+where howa partie man Query kay3ti lta7did  document li bghit njibha mn database.
+
+kytst3ml m3a findOne, find, createQueryBuilder …
+
+objectif: filtrer data 3la 7sab chorot mo3ayana.
+==================================================================
+2️⃣ Syntax f Repository
+repository.findOne({ where: { field: value } });
+repository.find({ where: { field1: value1, field2: value2 } });
+field =column li bghit n9arn m3ah value
+
+ila bghit chorot mota3adida ktabhom  object.

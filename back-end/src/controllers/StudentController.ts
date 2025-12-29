@@ -3,21 +3,34 @@ import { AppDataSource } from '../data-source';
 import { Student } from '../entities/Student';
 import { Class } from '../entities/Class';
 
-// دالة للتحقق من class وتعيد entity أو ترمي error
-async function getClassByName(className: string): Promise<Class> {
-  if (!className || className.trim() === '') throw new Error('className is required');
+async function getClassByName(
+  className: string,
+  res?: Response,
+): Promise<Class | Response> {
+  if (!className || className.trim() === '')
+    return res!.status(400).json({ message: 'className is required' });
   const classRepo = AppDataSource.getRepository(Class);
-  const classEntity = await classRepo.findOne({ where: { name: className.trim() } });
-  if (!classEntity) throw new Error('Invalid className');
+  const classEntity = await classRepo.findOne({
+    where: { name: className.trim() },
+  });
+  if (!classEntity)
+    return res!.status(400).json({ message: 'Invalid className' });
   return classEntity;
 }
 
-// دالة للتحقق من البريد الإلكتروني الفريد
-async function checkUniqueEmail(email: string, excludeId?: number) {
-  if (!email || email.trim() === '') throw new Error('Email is required');
+async function checkUniqueEmail(
+  email: string,
+  excludeId?: number,
+  res?: Response,
+): Promise<void | Response> {
+  if (!email || email.trim() === '')
+    return res!.status(400).json({ message: 'Email is required' });
   const studentRepo = AppDataSource.getRepository(Student);
-  const existing = await studentRepo.findOne({ where: { email: email.trim() } });
-  if (existing && existing.id !== excludeId) throw new Error('Email already in use');
+  const existing = await studentRepo.findOne({
+    where: { email: email.trim() },
+  });
+  if (existing && existing.id !== excludeId)
+    return res!.status(409).json({ message: 'Email already in use' });
 }
 
 export class StudentController {
@@ -35,11 +48,16 @@ export class StudentController {
   static async getById(req: Request<{ id: string }>, res: Response) {
     try {
       const id = Number(req.params.id);
-      if (Number.isNaN(id)) return res.status(400).json({ message: 'Invalid id parameter' });
+      if (Number.isNaN(id))
+        return res.status(400).json({ message: 'Invalid id parameter' });
 
       const repo = AppDataSource.getRepository(Student);
-      const student = await repo.findOne({ where: { id }, relations: ['classEntity'] });
-      if (!student) return res.status(404).json({ message: 'Student not found' });
+      const student = await repo.findOne({
+        where: { id },
+        relations: ['classEntity'],
+      });
+      if (!student)
+        return res.status(404).json({ message: 'Student not found' });
 
       return res.status(200).json({ data: student });
     } catch (err) {
@@ -48,39 +66,65 @@ export class StudentController {
     }
   }
 
-  static async create(req: Request<{}, {}, { name: string; email: string; className: string }>, res: Response) {
+  static async create(
+    req: Request<{}, {}, { name: string; email: string; className: string }>,
+    res: Response,
+  ) {
     try {
       const { name, email, className } = req.body;
-      if (!name || name.trim() === '') return res.status(400).json({ message: 'Name is required' });
+      if (!name || name.trim() === '')
+        return res.status(400).json({ message: 'Name is required' });
 
-      const classEntity = await getClassByName(className);
-      await checkUniqueEmail(email);
+      const classOrRes = await getClassByName(className, res);
+      if ((classOrRes as Response).headersSent) return;
+      const classEntity = classOrRes as Class;
+      const emailCheck = await checkUniqueEmail(email, undefined, res);
+      if ((emailCheck as Response)?.headersSent) return;
 
       const repo = AppDataSource.getRepository(Student);
-      const student = repo.create({ name: name.trim(), email: email.trim(), classEntity });
+      const student = repo.create({
+        name: name.trim(),
+        email: email.trim(),
+        classEntity,
+      });
       const saved = await repo.save(student);
 
       return res.status(201).json({ data: saved });
     } catch (err: any) {
       console.error(err);
-      return res.status(400).json({ message: err.message || 'Internal server error' });
+      return res
+        .status(400)
+        .json({ message: err.message || 'Internal server error' });
     }
   }
 
-  static async update(req: Request<{ id: string }, {}, { name: string; email: string; className: string }>, res: Response) {
+  static async update(
+    req: Request<
+      { id: string },
+      {},
+      { name: string; email: string; className: string }
+    >,
+    res: Response,
+  ) {
     try {
       const id = Number(req.params.id);
-      if (Number.isNaN(id)) return res.status(400).json({ message: 'Invalid id parameter' });
+      if (Number.isNaN(id))
+        return res.status(400).json({ message: 'Invalid id parameter' });
 
       const { name, email, className } = req.body;
-      if (!name || name.trim() === '') return res.status(400).json({ message: 'Name is required' });
+      if (!name || name.trim() === '')
+        return res.status(400).json({ message: 'Name is required' });
 
       const repo = AppDataSource.getRepository(Student);
       const student = await repo.findOne({ where: { id } });
-      if (!student) return res.status(404).json({ message: 'Student not found' });
+      if (!student)
+        return res.status(404).json({ message: 'Student not found' });
 
-      const classEntity = await getClassByName(className);
-      await checkUniqueEmail(email, id);
+      const classOrRes = await getClassByName(className, res);
+      if ((classOrRes as Response).headersSent) return;
+      const classEntity = classOrRes as Class;
+      const emailCheck = await checkUniqueEmail(email, id, res);
+      if ((emailCheck as Response)?.headersSent) return;
 
       student.name = name.trim();
       student.email = email.trim();
@@ -90,18 +134,22 @@ export class StudentController {
       return res.status(200).json({ data: updated });
     } catch (err: any) {
       console.error(err);
-      return res.status(400).json({ message: err.message || 'Internal server error' });
+      return res
+        .status(400)
+        .json({ message: err.message || 'Internal server error' });
     }
   }
 
   static async remove(req: Request<{ id: string }>, res: Response) {
     try {
       const id = Number(req.params.id);
-      if (Number.isNaN(id)) return res.status(400).json({ message: 'Invalid id parameter' });
+      if (Number.isNaN(id))
+        return res.status(400).json({ message: 'Invalid id parameter' });
 
       const repo = AppDataSource.getRepository(Student);
       const student = await repo.findOne({ where: { id } });
-      if (!student) return res.status(404).json({ message: 'Student not found' });
+      if (!student)
+        return res.status(404).json({ message: 'Student not found' });
 
       await repo.remove(student);
       return res.status(200).json({ message: 'Student deleted' });

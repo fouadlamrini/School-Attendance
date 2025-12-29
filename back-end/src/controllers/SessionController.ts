@@ -18,7 +18,10 @@ export class SessionController {
   private static async findRelations(
     body: SessionBody,
     reqUser?: { id: number; role: UserRole },
-  ) {
+    res?: Response,
+  ): Promise<
+    { classEntity: Class; subject: Subject; teacher: User | null } | Response
+  > {
     const classRepo = AppDataSource.getRepository(Class);
     const subjectRepo = AppDataSource.getRepository(Subject);
     const userRepo = AppDataSource.getRepository(User);
@@ -26,19 +29,22 @@ export class SessionController {
     const classEntity = await classRepo.findOne({
       where: { name: body.className.trim() },
     });
-    if (!classEntity) throw new Error('Invalid className');
+    if (!classEntity)
+      return res!.status(400).json({ message: 'Invalid className' });
 
     const subject = await subjectRepo.findOne({
       where: { name: body.subjectName.trim() },
     });
-    if (!subject) throw new Error('Invalid subjectName');
+    if (!subject)
+      return res!.status(400).json({ message: 'Invalid subjectName' });
 
     let teacher: User | null = null;
     if (body.teacherName?.trim()) {
       teacher = await userRepo.findOne({
         where: { name: body.teacherName.trim() },
       });
-      if (!teacher) throw new Error('Invalid teacherName');
+      if (!teacher)
+        return res!.status(400).json({ message: 'Invalid teacherName' });
     } else if (reqUser?.role === UserRole.TEACHER) {
       teacher = await userRepo.findOne({ where: { id: reqUser.id } });
     }
@@ -88,8 +94,13 @@ export class SessionController {
           .status(400)
           .json({ message: 'date is required in YYYY-MM-DD format' });
 
-      const { classEntity, subject, teacher } =
-        await SessionController.findRelations(req.body, req.user);
+      const rel = await SessionController.findRelations(
+        req.body,
+        req.user,
+        res,
+      );
+      if ((rel as Response).headersSent) return;
+      const { classEntity, subject, teacher } = rel as any;
 
       const sessionRepo = AppDataSource.getRepository(Session);
       const saved = await sessionRepo.save(
@@ -134,8 +145,13 @@ export class SessionController {
       if (!session)
         return res.status(404).json({ message: 'Session not found' });
 
-      const { classEntity, subject, teacher } =
-        await SessionController.findRelations(req.body, req.user);
+      const rel = await SessionController.findRelations(
+        req.body,
+        req.user,
+        res,
+      );
+      if ((rel as Response).headersSent) return;
+      const { classEntity, subject, teacher } = rel as any;
 
       session.date = date;
       session.classEntity = classEntity;

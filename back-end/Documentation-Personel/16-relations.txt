@@ -1,0 +1,48 @@
+notion:relations
+=============================================================
+1️⃣ chno hiya relations?
+relations katst3ml f find o findOne
+
+lhadaf dyalha howa ta7mil (fetch) l3ala9at lmortabita b entity
+
+bla relations → TypeORM kyrj3 ghir table ra2isiya
+
+m3a relations → kyrj3 objects mrtabta (joins til9a2i)
+=============================================================
+2️⃣ Syntax
+repository.findOne({
+  where: { id },
+  relations: ['relationName'],
+});
+
+أو عدة علاقات:
+repository.findOne({
+  where: { id },
+  relations: ['relation1', 'relation2'],
+});
+=============================================================
+3️⃣ المثال الأول (بسيط)
+const attendance = await attendanceRepo.findOne({
+  where: { id },
+  relations: ['session', 'student'],
+});
+
+شنو واقع هنا 👇
+
+Attendance 3ndo:
+
+ManyToOne → Session
+
+ManyToOne → Student
+
+relations kt9ol l TypeORM:
+
+jib attendance + jib m3ah session o student
+
+📌 النتيجة:
+{
+  "id": 1,
+  "status": "present",
+  "session": { ... },
+  "student": { ... }
+}

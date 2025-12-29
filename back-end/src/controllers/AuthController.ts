@@ -48,42 +48,58 @@ export class AuthController {
     }
   }
 
-  // -------------------
-  // LOGIN
-  // -------------------
-  static async login(req: Request<{}, {}, AuthBody>, res: Response) {
-    try {
-      const { email, password } = req.body;
-      if (!email?.trim() || !password) return res.status(400).json({ message: 'Email and password are required' });
+ // -------------------
+// LOGIN
+// -------------------
+static async login(req: Request<{}, {}, AuthBody>, res: Response) {
+  try {
+    const { email, password } = req.body;
 
-      const userRepo = AppDataSource.getRepository(User);
-
-      // Fetch user with password
-      const userWithPassword = await userRepo
-        .createQueryBuilder('user')
-        .addSelect('user.password')
-        .where('user.email = :email', { email })
-        .getOne();
-
-      if (!userWithPassword) return res.status(400).json({ message: 'Invalid email or password' });
-
-      const isMatch = await bcrypt.compare(password, userWithPassword.password);
-      if (!isMatch) return res.status(400).json({ message: 'Invalid email or password' });
-
-      const secret = process.env.JWT_SECRET;
-      if (!secret) return res.status(500).json({ message: 'Authentication not configured' });
-
-      const token = jwt.sign({ userId: userWithPassword.id, role: userWithPassword.role }, secret, { expiresIn: '7d' });
-
-      // Return user without password
-      const safeUser = await userRepo.findOne({ where: { id: userWithPassword.id } });
-
-      return res.status(200).json({ token, user: safeUser });
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Internal server error' });
+    if (!email?.trim() || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
     }
+
+    const userRepo = AppDataSource.getRepository(User);
+
+    // Fetch user WITH password using select
+    const user = await userRepo.findOne({
+      where: { email },
+      select: ['id', 'email', 'password', 'role'],
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid email or password' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid email or password' });
+    }
+
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      return res.status(500).json({ message: 'Authentication not configured' });
+    }
+
+    const token = jwt.sign(
+      { userId: user.id, role: user.role },
+      secret,
+      { expiresIn: '7d' },
+    );
+
+    // Remove password before returning
+    const { password: _, ...safeUser } = user;
+
+    return res.status(200).json({
+      token,
+      user: safeUser,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Internal server error' });
   }
+}
+
 }
 
 export default AuthController;

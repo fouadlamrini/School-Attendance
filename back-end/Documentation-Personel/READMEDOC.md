@@ -9,42 +9,22 @@
 # /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(studentEmail)
 # getRepository(Attendance)
 # any
-# as
-# save()
+# as  /////////:
+# join
+# where
+# save
 # relations
-# createQueryBuildder()
-
-# getMany()
-# addSelect
-# getOne()
-# remove()
-# where()
-# andWhere()
-# count()
-# getCount()
+# remove
+# Partial
 # setHeader
-# send()
-# import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-# @Entity()
-# @PrimaryGeneratedColumn()
-# @Column
-# @ManyToOne
-# @OneToMany
-# import { Request, Response, NextFunction } from 'express';
-# declare global{}
-# namespace Express {}
-# interface Request{}
-# req.header
-# jwt.verify()
+# declare global
+# namespace
+# interface
+# NextFunction
+# jwt.verify
 # @param
 # eslint
-# .prettierrc
-# import 'reflect-metadata';
-# import { DataSource } from 'typeorm';
-# synchronize: true
-# logging: false
-# entities: [User, Class, Student, Subject, Session, Attendance]
-# migrations: []
-# subscribers: []
-# initialize
-# tsconfig.json
+# prettier
+# new DataSource
+# initialize()
+# exit

@@ -3,7 +3,7 @@ import { AppDataSource } from '../data-source';
 import { Attendance } from '../entities/Attendance';
 import { AttendanceStatus } from '../entities/enums/AttendanceStatus';
 
-// دالة مستقلة لحساب عدد الحضور حسب status و entity
+
 async function countStatus(
   filter: Partial<{ studentId: number; classId: number }>,
   status: AttendanceStatus
