@@ -15,7 +15,6 @@
 # save
 # relations
 # remove
-# Partial
 # setHeader
 # declare global
 # namespace

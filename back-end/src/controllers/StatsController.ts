@@ -5,7 +5,7 @@ import { AttendanceStatus } from '../entities/enums/AttendanceStatus';
 
 
 async function countStatus(
-  filter: Partial<{ studentId: number; classId: number }>,
+  filter: { studentId?: number; classId?: number },
   status: AttendanceStatus
 ): Promise<number> {
   const repo = AppDataSource.getRepository(Attendance);
@@ -24,6 +24,7 @@ async function countStatus(
 
   return 0;
 }
+
 
 export class StatsController {
   static async getClassStats(req: Request<{ id: string }>, res: Response) {

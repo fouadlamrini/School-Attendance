@@ -1,0 +1,29 @@
+notion: remove
+=================================================================
+1️⃣ chno hiya remove f TypeORM?
+remove() hiya method dyal Repository katst3ml bach tamsa7 record man database i3timadan 3la entity object ( machi ghir id).
+📌 ya3ni: khask tkon jbti object mn DB mn 9bal oman ba3d kat9olo yt7yd.
+=================================================================
+2️⃣ كيفاش كتخدم؟
+السيناريو المعتاد:
+const existing = await classRepo.findOne({ where: { id } });
+if (!existing) return;
+await classRepo.remove(existing);
+
+🔁 الخطوات:
+
+ktjib  entity mn DB (findOne)
+
+katdawz  nfs object l remove
+
+TypeORM kaydir:
+DELETE FROM class WHERE id = ?
+====================================================================
+5️⃣ imta nkhtar remove?
+khdam b remove ila:
+
+3ndk relations b cascade
+
+ktst3ml hooks
+
+baghi solok ORM kaml
